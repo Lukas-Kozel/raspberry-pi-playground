@@ -11,9 +11,10 @@
 #define MAX 1024
 
 class UDPClient{
-    private:
+    protected:
     int sockfd;
     struct sockaddr_in addr;
+    struct ip_mreq mreq;
     public:
     UDPClient(const std::string& ip,const int port);
     ~UDPClient();
