@@ -18,6 +18,7 @@ int main() {
 
     while (true) {
         heartbeat.update_timestamp();
+        heartbeat.update_life_counter();
         std::vector<uint8_t> heartbeatMessage(heartbeat.size());
         heartbeat.serialize(heartbeatMessage.data());
         sender.sendMulticast(heartbeatMessage);
