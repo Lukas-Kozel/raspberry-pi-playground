@@ -13,6 +13,7 @@ set(CLIENT_SOURCES
     Multicast_sender.cpp
     client.cpp
     msg/heartbeat.cpp
+    utils.cpp
 )
 
 # Add the source files for the main executable
@@ -21,6 +22,7 @@ set(SERVER_SOURCES
     multicast_receiver.cpp
     client.cpp
     msg/heartbeat.cpp
+    utils.cpp
 )
 
 # Add the source files for the communication tester executable
