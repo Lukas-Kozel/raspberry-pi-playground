@@ -8,9 +8,17 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Add the source files for the main executable
-set(MAIN_SOURCES
-    main.cpp
+set(CLIENT_SOURCES
+    main_client.cpp
     Multicast_sender.cpp
+    client.cpp
+    msg/heartbeat.cpp
+)
+
+# Add the source files for the main executable
+set(SERVER_SOURCES
+    main_server.cpp
+    multicast_receiver.cpp
     client.cpp
     msg/heartbeat.cpp
 )
@@ -23,17 +31,25 @@ set(TESTER_SOURCES
 )
 
 # Add the main executable target
-add_executable(main ${MAIN_SOURCES})
+add_executable(main_client ${CLIENT_SOURCES})
+
+# Add the main executable target
+add_executable(main_server ${SERVER_SOURCES})
 
 # Add the communication tester executable target
 add_executable(communication_tester ${TESTER_SOURCES})
 
 # Add include directories
-target_include_directories(main PUBLIC
+target_include_directories(main_client PUBLIC
     "${PROJECT_SOURCE_DIR}/msg"
     "${PROJECT_SOURCE_DIR}"
 )
 
+# Add include directories
+target_include_directories(main_server PUBLIC
+    "${PROJECT_SOURCE_DIR}/msg"
+    "${PROJECT_SOURCE_DIR}"
+)
 target_include_directories(communication_tester PUBLIC
     "${PROJECT_SOURCE_DIR}/msg"
     "${PROJECT_SOURCE_DIR}"
@@ -43,5 +59,6 @@ target_include_directories(communication_tester PUBLIC
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 # Specify the install location for the binaries
-install(TARGETS main DESTINATION "${PROJECT_SOURCE_DIR}/bin")
+install(TARGETS main_client DESTINATION "${PROJECT_SOURCE_DIR}/bin")
+install(TARGETS main_server DESTINATION "${PROJECT_SOURCE_DIR}/bin")
 install(TARGETS communication_tester DESTINATION "${PROJECT_SOURCE_DIR}/bin")

@@ -1,3 +1,5 @@
+//< raspberry Pi main app.
+
 #include "Multicast_sender.h"
 #include "msg/heartbeat.h"
 #include <chrono>
@@ -9,7 +11,10 @@ int main() {
     const int port = 8081;
 
     MulticastSender sender(multicast_ip, port);
-    Heartbeat heartbeat(0, 0, 0, 0);
+    std::cout << "loaded" << std::endl;
+    std::thread hb_thread([&](){
+        std::cout << "thread created" << std::endl;
+    Heartbeat heartbeat;
 
     while (true) {
         heartbeat.update_timestamp();
@@ -18,6 +23,8 @@ int main() {
         sender.sendMulticast(heartbeatMessage);
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
+    });
 
+    hb_thread.join();
     return 0;
 }
