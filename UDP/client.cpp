@@ -3,6 +3,7 @@
 #include <cstring>
 
 UDPClient::UDPClient(const std::string& ip, const int port) {
+    multicast_ip = ip;
     // Create socket
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd < 0) {
@@ -60,7 +61,7 @@ UDPClient::~UDPClient() {
 
 void UDPClient::send(const std::vector<uint8_t>& message) {
     // Ensure the address is set correctly for sending
-    addr.sin_addr.s_addr = inet_addr("224.0.0.1");  // Multicast IP
+    addr.sin_addr.s_addr = inet_addr((char*)&multicast_ip);  // Multicast IP
     int n = sendto(sockfd, message.data(), message.size(), 0, (struct sockaddr*)&addr, sizeof(addr));
     if (n < 0) {
         std::cerr << "Send failed: " << strerror(errno) << "\n";

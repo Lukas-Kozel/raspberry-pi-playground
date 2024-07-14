@@ -15,6 +15,7 @@ class UDPClient{
     int sockfd;
     struct sockaddr_in addr;
     struct ip_mreq mreq;
+    std::string multicast_ip;
     public:
     UDPClient(const std::string& ip,const int port);
     ~UDPClient();

@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Heartbeat::Heartbeat(int64_t timestamp_ms, int32_t timestamp_ns, uint64_t life_counter, uint8_t error_code,uint8_t status){
+Heartbeat::Heartbeat(uint64_t timestamp_ms, uint32_t timestamp_ns, uint64_t life_counter, uint8_t error_code,Status status){
     this->timestamp_ms = timestamp_ms;
     this->timestamp_ns = timestamp_ns;
     this->life_counter = life_counter;
@@ -12,7 +12,7 @@ Heartbeat::Heartbeat(int64_t timestamp_ms, int32_t timestamp_ns, uint64_t life_c
 
 }
 
-Heartbeat::Heartbeat() : timestamp_ms(0), timestamp_ns(0), life_counter(0), error_code(0), status(0) {}
+Heartbeat::Heartbeat() : timestamp_ms(0), timestamp_ns(0), life_counter(0), error_code(0), status(OK_STATUS) {}
 
 void Heartbeat::update_life_counter()
 {
