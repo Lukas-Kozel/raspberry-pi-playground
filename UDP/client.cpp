@@ -1,3 +1,5 @@
+// basically interface or base class for UDP communication
+
 #include "client.h"
 #include <iostream>
 #include <cstring>

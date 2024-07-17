@@ -1,4 +1,5 @@
 //< server main app.
+// purpose of this main server component is to validate HB, send commands via GUI and keep track of current status of client.
 
 #include "multicast_receiver.h"
 #include "msg/heartbeat.h"
