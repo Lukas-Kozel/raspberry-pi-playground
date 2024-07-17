@@ -1,0 +1,27 @@
+# Ignore everything in the bin directory
+bin/*
+
+# Allow the bin directory itself (but it will be empty)
+!bin/
+
+# Ignore everything in the build_rpi directory
+build_rpi/*
+
+# Allow the build_rpi directory itself (but it will be empty)
+!build_rpi/
+
+# Ignore everything in the build_pc directory
+build_pc/*
+
+# Allow the build_pc directory itself (but it will be empty)
+!build_pc/
+
+# Ignore all other build directories
+build/*
+
+# Allow the utils/include/inih directory
+!utils/include/inih/
+
+deprecated/
+
+.vscode
