@@ -8,13 +8,25 @@
 #include <cctype>
 #include <thread>
 #include <vector>
+#include <sstream>
 #include <unistd.h>
 #include <iostream>
 #include "utils/logger.h"
 
+enum HeartbeatValidationError {
+    HB_ERROR_NONE           = 0b00000000, // No error
+    HB_ERROR_CODE           = 0b00000001, // Error code is non-zero
+    HB_ERROR_STATUS         = 0b00000010, // Status is not OK
+    HB_ERROR_TIMESTAMP      = 0b00000100, // Timestamp is invalid
+    HB_ERROR_LIFE_COUNTER   = 0b00001000  // Life counter is invalid
+};
+uint8_t hb_error_flags = HB_ERROR_NONE;
+
+
 uint32_t previous_life_counter = 0;
 uint8_t tolerance = 100; // in ms
 uint64_t timestamp_ms_previous=static_cast<uint64_t>( std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+Logger logger("./Configuration/config.conf");
 
 bool validate_hb_msg(Heartbeat *hb);
 bool validate_timestamp(uint64_t timestamp_ms_current, uint64_t tolerance);
@@ -40,17 +52,20 @@ int main(int argc, char* argv[]) {
                 Heartbeat hb = Heartbeat::deserialize(heartbeatMessage.data());
                 if(!validate_hb_msg(&hb)){
                     std::cerr << "Heartbeat message is not valid" << std::endl;
-                    exit(EXIT_FAILURE);
+                    //exit(EXIT_FAILURE);
                 } 
                 previous_life_counter = hb.life_counter;
-                timestamp_ms_previous = hb.timestamp_ms;                  
-                if(argParser.debug) std::cout << "time_ms = " << hb.timestamp_ms 
+                timestamp_ms_previous = hb.timestamp_ms;
+                std::ostringstream oss;
+                oss << "time_ms = " << hb.timestamp_ms 
                         << " ; time_ns = " << hb.timestamp_ns 
                         << " ; life_counter = " << hb.life_counter
                         << " ; error_code = " << (int)hb.error_code 
-                        << " ; status = " << (int)hb.status 
-                        << std::endl;
+                        << " ; status = " << (int)hb.status; 
+                logger.log(DEBUG,oss.str()+"\n");                 
+                if(argParser.debug) std::cout << oss.str() << std::endl;
             } else {
+                logger.log(DEBUG,"No new data received\n"); 
                 if(argParser.debug) std::cout << "No new data received\n";
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -62,10 +77,27 @@ int main(int argc, char* argv[]) {
 }
 
 bool validate_hb_msg(Heartbeat *hb){ //TODO: refactor this to version via binary ok steps to determine, which of those is not ok. 
-    if(hb->error_code != 0 || hb->status != OK_STATUS || !validate_timestamp(hb->timestamp_ms,tolerance) || !validate_life_counter(hb->life_counter)){
+    bool error_code_ok = hb->error_code ==0;
+    bool status_ok = hb->status == OK_STATUS;
+    bool timestamp_ok = validate_timestamp(hb->timestamp_ms, tolerance);
+    bool life_counter_ok = validate_life_counter(hb->life_counter);
+    if(!error_code_ok){
+        hb_error_flags |= HB_ERROR_CODE;
         return false;
     }
-    return true;
+    if(!status_ok){
+        hb_error_flags |= HB_ERROR_STATUS;
+        return false;
+    }
+    if(!timestamp_ok){
+        hb_error_flags |= HB_ERROR_TIMESTAMP;
+        return false;
+    }
+    if(!life_counter_ok){
+        hb_error_flags |= HB_ERROR_LIFE_COUNTER;
+        return false;
+    }
+
 }
 
 bool validate_timestamp(uint64_t timestamp_ms_current, uint64_t tolerance) {
@@ -80,5 +112,22 @@ bool validate_life_counter(uint32_t life_counter){
         return true;
     }
     return false;
+}
+
+void check_and_report_failure(){
+    if(hb_error_flags != HB_ERROR_CODE){
+        if(hb_error_flags & HB_ERROR_CODE){
+            logger.log(ERROR,"HB failure, incomming error code is not 0");
+        }
+        if(hb_error_flags & HB_ERROR_STATUS){
+            logger.log(ERROR,"HB failure, incomming status is not 0");
+        }
+        if(hb_error_flags & HB_ERROR_LIFE_COUNTER){
+            logger.log(ERROR,"HB failure, incomming life counter is not valid");
+        }
+        if(hb_error_flags & HB_ERROR_TIMESTAMP){
+            logger.log(ERROR,"HB failure, incomming timestamp is not valid");
+        }
+    }
 }
 

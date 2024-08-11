@@ -93,7 +93,7 @@ void Logger::close_file(std::ofstream& log_file) {
 std::uintmax_t Logger::get_file_size(const std::string &file_path)
 {
     std::filesystem::path path(file_path);
-    if(std::filesystem::exists(path)){ return std::filesystem::file_size(path)/1048576;} //convertion from bytes to MB// && std::filesystem::is_regular_file(path)
+    if(std::filesystem::exists(path)){ return std::filesystem::file_size(path)/1048576;} //convertion from bytes to MB
     else {
         std::cerr << "File does not exist " << file_path << std::endl;
         return 0;
