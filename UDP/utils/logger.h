@@ -1,4 +1,8 @@
 #include <iostream>
+#include <chrono>
+#include <iomanip>
+#include <sstream>
+#include <ctime>
 #include <string>
 #include<ctype.h>
 #include <fstream>
@@ -40,6 +44,7 @@ private:
     void rename_file(const std::string& file_path);
     std::string insert_before_extension(const std::string &file_path, int index);
     void perform_operation_log_files();
+    std::string get_current_timestamp();
 
 public:
     Logger(const std::string& config_path); //only for initialization of logger. 

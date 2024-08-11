@@ -3,11 +3,11 @@
 void Logger::write_log(LOG_LEVEL log_level, const std::string& message) {
     perform_operation_log_files();
     if(log_level == LOG_LEVEL::ERROR){
-        main_log_file << "[" << log_level << "]" << message << std::endl;
-        error_log_file << "[" << log_level << "]" << message << std::endl;
+        main_log_file << get_current_timestamp() << " [" << log_level << "] " << message << std::endl;
+        error_log_file <<get_current_timestamp() << " [" << log_level << "] " << message << std::endl;
     }
     else{
-        main_log_file << "[" << log_level << "]" << message << std::endl;
+        main_log_file << get_current_timestamp() <<" [" << log_level << "] " << message << std::endl;
     }
 }
 
@@ -158,6 +158,21 @@ void Logger::perform_operation_log_files()
             error_log_file = open_file_for_log(error_log_config.file);
         }
     }
+}
+
+std::string Logger::get_current_timestamp(){
+    auto now = std::chrono::system_clock::now();
+    auto now_time_t = std::chrono::system_clock::to_time_t(now);
+    auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch() % 1000);
+
+    std::tm now_tm = *std::localtime(&now_time_t);
+
+    std::ostringstream oss;
+    oss << std::put_time(&now_tm, "%Y-%m-%d %H:%M:%S"); // Date and time
+    oss << '.' << std::setfill('0') << std::setw(3) << now_ms.count(); // Milliseconds
+
+    return oss.str();
+
 }
 
 Logger::~Logger() {
