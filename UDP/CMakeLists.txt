@@ -7,6 +7,10 @@ project(HeartbeatProject)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Set include libs path
+set(INCLUDE_INIH /home/luky/playground/raspberry_pi/UDP/utils/include/inih/cpp)
+set(INCLUDE_INI_C /home/luky/playground/raspberry_pi/UDP/utils/include/inih)
+
 # Check if a toolchain file was specified
 if(DEFINED CMAKE_TOOLCHAIN_FILE)
     message(STATUS "Toolchain file specified: ${CMAKE_TOOLCHAIN_FILE}")
@@ -24,11 +28,14 @@ if(IS_CROSS_COMPILING)
     
     # Add the source files for the main executable
     set(CLIENT_SOURCES
-        main_client.cpp
+        client/main_client.cpp
         Multicast_sender.cpp
         client.cpp
         msg/heartbeat.cpp
-        utils.cpp
+        utils/utils.cpp
+        utils/logger.cpp
+        ${INCLUDE_INIH}/INIReader.cpp
+        ${INCLUDE_INI_C}/ini.c
     )
 
     # Add the main executable target
@@ -36,6 +43,7 @@ if(IS_CROSS_COMPILING)
     target_include_directories(main_client PUBLIC
         "${PROJECT_SOURCE_DIR}/msg"
         "${PROJECT_SOURCE_DIR}"
+        ${INCLUDE_INIH}
     )
 
     install(TARGETS main_client DESTINATION "${PROJECT_SOURCE_DIR}/bin/rpi")
@@ -43,19 +51,25 @@ if(IS_CROSS_COMPILING)
 else()
     # Add the source files for the main executable
     set(CLIENT_SOURCES
-        main_client.cpp
+        client/main_client.cpp
         Multicast_sender.cpp
         client.cpp
         msg/heartbeat.cpp
-        utils.cpp
+        utils/utils.cpp
+        utils/logger.cpp
+        ${INCLUDE_INIH}/INIReader.cpp
+        ${INCLUDE_INI_C}/ini.c
     )
     # Add the source files for the server executable
     set(SERVER_SOURCES
-        main_server.cpp
+        server/main_server.cpp
         multicast_receiver.cpp
         client.cpp
         msg/heartbeat.cpp
-        utils.cpp
+        utils/utils.cpp
+        utils/logger.cpp
+        ${INCLUDE_INIH}/INIReader.cpp
+        ${INCLUDE_INI_C}/ini.c
     )
 
     # Add the source files for the communication tester executable
@@ -74,11 +88,13 @@ else()
     target_include_directories(main_client PUBLIC
         "${PROJECT_SOURCE_DIR}/msg"
         "${PROJECT_SOURCE_DIR}"
+        ${INCLUDE_INIH}
     )
 
     target_include_directories(main_server PUBLIC
         "${PROJECT_SOURCE_DIR}/msg"
         "${PROJECT_SOURCE_DIR}"
+        ${INCLUDE_INIH}
     )
 
     target_include_directories(communication_tester PUBLIC

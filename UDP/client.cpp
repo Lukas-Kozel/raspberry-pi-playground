@@ -63,7 +63,7 @@ UDPClient::~UDPClient() {
 
 void UDPClient::send(const std::vector<uint8_t>& message) {
     // Ensure the address is set correctly for sending
-    addr.sin_addr.s_addr = inet_addr((char*)&multicast_ip);  // Multicast IP
+    addr.sin_addr.s_addr = inet_addr(multicast_ip.c_str());  // Multicast IP
     int n = sendto(sockfd, message.data(), message.size(), 0, (struct sockaddr*)&addr, sizeof(addr));
     if (n < 0) {
         std::cerr << "Send failed: " << strerror(errno) << "\n";

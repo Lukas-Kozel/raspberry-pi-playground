@@ -3,34 +3,35 @@
 
 #include "multicast_receiver.h"
 #include "msg/heartbeat.h"
-#include "utils.h"
+#include "utils/utils.h"
 #include <chrono>
 #include <cctype>
 #include <thread>
 #include <vector>
 #include <unistd.h>
 #include <iostream>
+#include "utils/logger.h"
 
 uint32_t previous_life_counter = 0;
 uint8_t tolerance = 100; // in ms
-uint64_t timestamp_ms_previous=0;
+uint64_t timestamp_ms_previous=static_cast<uint64_t>( std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
 
 bool validate_hb_msg(Heartbeat *hb);
 bool validate_timestamp(uint64_t timestamp_ms_current, uint64_t tolerance);
 bool validate_life_counter(uint32_t life_counter);
 
 int main(int argc, char* argv[]) {
-    Config config;
-    parse_arguments(argc,argv,config);
+    ArgParser argParser;
+    parse_arguments(argc,argv,argParser);
 
     const std::string multicast_ip = "224.0.0.1";
     const int port = 8081;
     MulticastReceiver receiver(multicast_ip, port);
     std::vector<uint8_t> heartbeatMessage(1024);
 
-    if(config.debug) std::cout << "loaded" << std::endl;
+    if(argParser.debug) std::cout << "loaded" << std::endl;
     std::thread hb_thread([&](){    
-        if(config.debug) std::cout << "thread created" << std::endl;
+        if(argParser.debug) std::cout << "thread created" << std::endl;
         while (true){
 
             receiver.receive(heartbeatMessage);
@@ -43,14 +44,14 @@ int main(int argc, char* argv[]) {
                 } 
                 previous_life_counter = hb.life_counter;
                 timestamp_ms_previous = hb.timestamp_ms;                  
-                if(config.debug) std::cout << "time_ms = " << hb.timestamp_ms 
+                if(argParser.debug) std::cout << "time_ms = " << hb.timestamp_ms 
                         << " ; time_ns = " << hb.timestamp_ns 
                         << " ; life_counter = " << hb.life_counter
                         << " ; error_code = " << (int)hb.error_code 
                         << " ; status = " << (int)hb.status 
                         << std::endl;
             } else {
-                if(config.debug) std::cout << "No new data received\n";
+                if(argParser.debug) std::cout << "No new data received\n";
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
             }
@@ -60,7 +61,7 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-bool validate_hb_msg(Heartbeat *hb){
+bool validate_hb_msg(Heartbeat *hb){ //TODO: refactor this to version via binary ok steps to determine, which of those is not ok. 
     if(hb->error_code != 0 || hb->status != OK_STATUS || !validate_timestamp(hb->timestamp_ms,tolerance) || !validate_life_counter(hb->life_counter)){
         return false;
     }

@@ -39,7 +39,7 @@ private:
     std::uintmax_t get_file_size(const std::string& file_path); 
     void rename_file(const std::string& file_path);
     std::string insert_before_extension(const std::string &file_path, int index);
-    bool perform_operation_log_files();
+    void perform_operation_log_files();
 
 public:
     Logger(const std::string& config_path); //only for initialization of logger. 

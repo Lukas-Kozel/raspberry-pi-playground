@@ -4,17 +4,17 @@
 #include <unistd.h>
 #include <cstdlib>
 
-void parse_arguments(int argc, char* argv[], Config& config) {
+void parse_arguments(int argc, char* argv[], ArgParser& argParser) {
     int opt;
     while ((opt = getopt(argc, argv, "d:h")) != -1) {
         switch (opt) {
             case 'd':
                 if (optarg != nullptr) {
                     if (std::strcmp(optarg, "true") == 0) {
-                        config.debug = true;
+                        argParser.debug = true;
                         std::cout << "Starting app in debug mode.\n";
                     } else if (std::strcmp(optarg, "false") == 0) {
-                        config.debug = false;
+                        argParser.debug = false;
                         std::cout << "Starting app without debug mode.\n";
                     } else {
                         std::cerr << "Invalid value for -d. Use 'true' or 'false'.\n";

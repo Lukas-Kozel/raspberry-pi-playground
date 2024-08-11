@@ -132,7 +132,7 @@ std::string Logger::insert_before_extension(const std::string& file_path, int in
     }
 }
 
-bool Logger::perform_operation_log_files()
+void Logger::perform_operation_log_files()
 {
     if(get_file_size(main_log_config.file) >= main_log_config.max_size) {
         if(main_log_config.max_files < number_of_main_log_files){
