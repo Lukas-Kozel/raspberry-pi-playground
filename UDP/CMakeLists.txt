@@ -8,8 +8,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Set include libs path
-set(INCLUDE_INIH /home/luky/playground/raspberry_pi/UDP/utils/include/inih/cpp)
-set(INCLUDE_INI_C /home/luky/playground/raspberry_pi/UDP/utils/include/inih)
+set(INCLUDE_INIH /home/lukas-kozel/raspberry-pi-playground/UDP/utils/include/inih/cpp)
+set(INCLUDE_INI_C /home/lukas-kozel/raspberry-pi-playground/UDP/utils/include/inih)
 
 # Check if a toolchain file was specified
 if(DEFINED CMAKE_TOOLCHAIN_FILE)
