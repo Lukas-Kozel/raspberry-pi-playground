@@ -8,6 +8,7 @@
 #include <fstream>
 #include "include/inih/cpp/INIReader.h"
 #include <filesystem>
+#include <unordered_map>
 
 
 enum LOG_LEVEL{
@@ -15,6 +16,12 @@ ERROR,
  DEBUG,
   WARNING,
    INFO
+};
+std::unordered_map<LOG_LEVEL, std::string> LOG_LEVEL_MAP = {
+    {ERROR, "ERROR"},
+    {DEBUG, "DEBUG"},
+    {WARNING, "WARNING"},
+    {INFO, "INFO"}
 };
 
 struct Config{
@@ -45,6 +52,7 @@ private:
     std::string insert_before_extension(const std::string &file_path, int index);
     void perform_operation_log_files();
     std::string get_current_timestamp();
+    std::string get_log_level_string(LOG_LEVEL log_level);
 
 public:
     Logger(const std::string& config_path); //only for initialization of logger. 

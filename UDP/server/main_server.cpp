@@ -32,7 +32,7 @@ Logger logger("/home/lukas-kozel/raspberry-pi-playground/UDP/server/Configuratio
 bool validate_hb_msg(Heartbeat *hb);
 bool validate_timestamp(uint64_t timestamp_ms_current, uint64_t tolerance);
 bool validate_life_counter(uint32_t life_counter);
-
+bool checksum(size_t received_size,size_t expected_size);
 int main(int argc, char* argv[]) {
     ArgParser argParser;
     parse_arguments(argc,argv,argParser);
@@ -43,6 +43,7 @@ int main(int argc, char* argv[]) {
     std::vector<uint8_t> heartbeatMessage(1024);
     Heartbeat hb_msg;
     if(argParser.debug) std::cout << "loaded" << std::endl;
+    logger.log(INFO,"server component initialized.");
     std::thread hb_thread([&](){    
         if(argParser.debug) std::cout << "thread created" << std::endl;
         while (true){
@@ -55,7 +56,7 @@ int main(int argc, char* argv[]) {
                     std::cerr << "Heartbeat message is not valid" << std::endl;
                     logger.log(ERROR,"Heartbeat message is not valid");
                     //exit(EXIT_FAILURE);
-                } 
+                }else{
                 previous_life_counter = hb_msg.life_counter;
                 timestamp_ms_previous = hb_msg.timestamp_ms;
                 std::ostringstream oss;
@@ -66,6 +67,7 @@ int main(int argc, char* argv[]) {
                         << " ; status = " << (int)hb_msg.status; 
                 logger.log(DEBUG,oss.str()+"\n");                 
                 if(argParser.debug) std::cout << oss.str() << std::endl;
+                }
             } else {
                 logger.log(DEBUG,"No new data received\n"); 
                 if(argParser.debug) std::cout << "No new data received\n";
@@ -79,7 +81,7 @@ int main(int argc, char* argv[]) {
 }
 
 bool validate_hb_msg(Heartbeat *hb){ //TODO: refactor this to version via binary ok steps to determine, which of those is not ok. 
-    //bool checksum_ok = checksum(sizeof(hb),heartbeatMessage);
+    bool checksum_ok = checksum(sizeof(hb),Heartbeat::size());
     bool error_code_ok = hb->error_code ==0;
     bool status_ok = hb->status == OK_STATUS;
     bool timestamp_ok = validate_timestamp(hb->timestamp_ms, tolerance);
@@ -100,7 +102,11 @@ bool validate_hb_msg(Heartbeat *hb){ //TODO: refactor this to version via binary
         hb_error_flags |= HB_ERROR_LIFE_COUNTER;
         return false;
     }
-    return false;
+    if(!checksum_ok){
+        hb_error_flags |= HB_CHECK_SUM_ERROR;
+        return false;
+    }
+    return true;
 }
 
 bool validate_timestamp(uint64_t timestamp_ms_current, uint64_t tolerance) {
@@ -117,9 +123,9 @@ bool validate_life_counter(uint32_t life_counter){
     return false;
 }
 
-// bool checksum(size_t received_size,size_t expected_size){
-//     return (received_size == expected_size);
-// }
+bool checksum(size_t received_size,size_t expected_size){
+    return (received_size == expected_size);
+}
 
 void check_and_report_failure(){
     if(hb_error_flags != HB_ERROR_CODE){

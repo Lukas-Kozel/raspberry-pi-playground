@@ -3,11 +3,11 @@
 void Logger::write_log(LOG_LEVEL log_level, const std::string& message) {
     perform_operation_log_files();
     if(log_level == LOG_LEVEL::ERROR){
-        main_log_file << get_current_timestamp() << " [" << log_level << "] " << message << std::endl;
-        error_log_file <<get_current_timestamp() << " [" << log_level << "] " << message << std::endl;
+        main_log_file << get_current_timestamp() << " [" << get_log_level_string(log_level) << "] " << message << std::endl;
+        error_log_file <<get_current_timestamp() << " [" << get_log_level_string(log_level) << "] " << message << std::endl;
     }
     else{
-        main_log_file << get_current_timestamp() <<" [" << log_level << "] " << message << std::endl;
+        main_log_file << get_current_timestamp() <<" [" << get_log_level_string(log_level) << "] " << message << std::endl;
     }
 }
 
@@ -173,6 +173,11 @@ std::string Logger::get_current_timestamp(){
 
     return oss.str();
 
+}
+
+std::string Logger::get_log_level_string(LOG_LEVEL log_level)
+{
+    return LOG_LEVEL_MAP[log_level];
 }
 
 Logger::~Logger() {
