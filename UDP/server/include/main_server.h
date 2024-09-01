@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <iostream>
 #include "utils/logger.h"
+#include <bitset>
 
 
 enum HeartbeatValidationError {
@@ -24,30 +25,35 @@ enum HeartbeatValidationError {
     HB_CHECK_SUM_ERROR      = 0b00010000  // checksum invalid
 };
 
+const std::string MULTICAST_IP = "224.0.0.1";
+const int PORT = 8081;
+const std::string LOGGER_CONFIG_PATH = "/home/luky/playground/raspberry_pi/UDP/server/Configuration/config.conf";
+
+
 class UDPServer
 {
 private:
 
-    static const std::string MULTICAST_IP = "224.0.0.1";
-    static const int PORT = 8081;
+     uint8_t hb_error_flags;
+     uint32_t previous_life_counter;
+     uint8_t tolerance;
+     uint64_t timestamp_ms_previous;
+     std::unique_ptr<Logger> logger;
+     std::unique_ptr<ArgParser> argParser;
+     std::unique_ptr<MulticastReceiver> receiver;
 
-    static uint8_t hb_error_flags;
-    static uint32_t previous_life_counter;
-    static uint8_t tolerance;
-    static uint64_t timestamp_ms_previous;
-    static std::unique_ptr<Logger> logger;
-    static std::unique_ptr<ArgParser> argParser;
-    static std::unique_ptr<MulticastReceiver> receiver;
-
-    static bool validate_hb_msg(Heartbeat* hb);
-    static bool validate_timestamp(uint64_t timestamp_ms_current, uint64_t tolerance);
-    static bool validate_life_counter(uint32_t life_counter);
-    static bool checksum(size_t received_size, size_t expected_size);
-    static void check_and_report_failure();
-    static void process_msg_callback(const std::vector<uint8_t>& heartbeatMessage);
+     bool validate_hb_msg(const Heartbeat &hb);
+     bool validate_timestamp(uint64_t timestamp_ms_current, uint64_t tolerance);
+     bool validate_life_counter(uint32_t life_counter);
+     bool checksum(size_t received_size, size_t expected_size);
+     void check_and_report_failure();
+     void process_msg_callback(const std::vector<uint8_t>& heartbeatMessage);
 
 public:
-    static void init(int argc, char* argv[]);
+    UDPServer(const std::string& multicast_ip, int port, const std::string& logger_config_path);
+    void init(int argc, char* argv[]);
+    void run();
+
 };
 
 #endif // SERVER_MAIN_H

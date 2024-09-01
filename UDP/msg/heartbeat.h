@@ -30,7 +30,8 @@ class Heartbeat{
     Heartbeat();
     void update_life_counter();
     static constexpr size_t size(){
-        return sizeof(timestamp_ms) + sizeof(timestamp_ns)+ sizeof(life_counter) + sizeof(error_code) + sizeof(status);
+      return sizeof(Heartbeat);
+        //return sizeof(timestamp_ms) + sizeof(timestamp_ns)+ sizeof(life_counter) + sizeof(error_code) + sizeof(status);
     };
 };
 #endif // HEARTBEAT_H

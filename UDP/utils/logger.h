@@ -1,3 +1,6 @@
+#ifndef LOGGER_H
+#define LOGGER_H
+
 #include <iostream>
 #include <chrono>
 #include <iomanip>
@@ -17,12 +20,7 @@ ERROR,
   WARNING,
    INFO
 };
-std::unordered_map<LOG_LEVEL, std::string> LOG_LEVEL_MAP = {
-    {ERROR, "ERROR"},
-    {DEBUG, "DEBUG"},
-    {WARNING, "WARNING"},
-    {INFO, "INFO"}
-};
+extern std::unordered_map<LOG_LEVEL, std::string> LOG_LEVEL_MAP;
 
 struct Config{
 std::string file;// = "./logs/error_log.txt"
@@ -59,3 +57,5 @@ public:
     ~Logger();
     void log(LOG_LEVEL log_level, const std::string& message);
 };
+
+#endif 

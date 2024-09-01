@@ -8,9 +8,10 @@
 #include "utils/logger.h"
 #include <chrono>
 #include <thread>
+#include <ostream>
 #include <vector>
 
-Logger logger("/home/lukas-kozel/raspberry-pi-playground/UDP/server/Configuration/config.conf");
+//Logger logger("/home/luky/playground/raspberry_pi/UDP/server/Configuration/config.conf");
 
 
 int main(int argc, char* argv[]) {
@@ -32,13 +33,14 @@ int main(int argc, char* argv[]) {
         heartbeat.serialize(heartbeatMessage.data());
         sender->sendMulticast(heartbeatMessage);
         std::ostringstream oss;
-        if(argParser.debug) oss << "time_ms = " << heartbeat.timestamp_ms 
+        oss << "time_ms = " << heartbeat.timestamp_ms 
         << " ; time_ns = " << heartbeat.timestamp_ns 
         << " ; life_counter = " << heartbeat.life_counter
         << " ; error_code = " << (int)heartbeat.error_code 
         << " ; status = " << (int)heartbeat.status 
         << std::endl;
-        logger.log(DEBUG,oss.str()+"\n");  
+         if(argParser.debug) std::cout <<(oss.str()) << std::endl;
+        //logger.log(DEBUG,oss.str()+"\n");  
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
     });

@@ -1,5 +1,15 @@
 #include "logger.h"
 
+
+// Define and initialize the map here
+std::unordered_map<LOG_LEVEL, std::string> LOG_LEVEL_MAP = {
+    {ERROR, "ERROR"},
+    {DEBUG, "DEBUG"},
+    {WARNING, "WARNING"},
+    {INFO, "INFO"}
+};
+
+
 void Logger::write_log(LOG_LEVEL log_level, const std::string& message) {
     perform_operation_log_files();
     if(log_level == LOG_LEVEL::ERROR){
